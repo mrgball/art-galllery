@@ -4,36 +4,63 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { AlertTriangle, CheckCircle } from 'lucide-react';
-import FullscreenSpinner from '../ui/FullScreenSpinner';
+import FullscreenSpinner from '../shared/FullScreenSpinner';
 import { useAuthQuery } from '@/lib/query/auth';
+import { Eye, EyeOff } from "lucide-react";
+import useAuthStore from '@/lib/store/authStore';
+import { useRouter } from 'next/navigation';
+
 
 export default function LoginForm() {
-  const {data, method} = useAuthQuery();
+  const {method} = useAuthQuery();
   const [form, setForm] = useState({ username: '', password: '' });
   const [alert, setAlert] = useState<{
     type: 'success' | 'error';
     message: string;
   } | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const {setToken, setRefreshToken } = useAuthStore.getState();
+  const router = useRouter();
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    setIsLoading(true);
+
     method.login.mutate({
         username: form.username,
         password: form.password,
+    }, {
+      onSuccess: (data: {access_token: string, refresh_token:string}) => {
+        setToken(data.access_token);
+        setRefreshToken(data.refresh_token);
+        setIsLoading(false);
+        setAlert({ type: "success", message: 'Berhasil login' });
+        router.push("/dashboard/categories");
+      },
+      onError: (error: any) => {
+        setAlert({ type: "error", message: error.response.data.message });
+        setIsLoading(false);
+      }
     });
   };
 
+
+
   useEffect(() => {
     if (alert) {
-      const timeout = setTimeout(() => setAlert(null), 4000);
+      const timeout = setTimeout(() => setAlert(null), 5000);
       return () => clearTimeout(timeout);
     }
   }, [alert]);
 
+
   return (
     <div className="flex flex-col items-center">
-      {method.login.isPending && <FullscreenSpinner/>}
+      {isLoading === true && <FullscreenSpinner/>}
       {alert && (
         <Alert
           variant={alert.type === 'success' ? 'default' : 'destructive'}
@@ -68,14 +95,23 @@ export default function LoginForm() {
           required
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full px-4 py-2 border border-gray-300 text-black rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-          required
-        />
+        <div className="relative w-full">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            className="w-full px-4 py-2 border border-gray-300 text-black rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 pr-10"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute rounded-lg right-3 top-1/2 transform -translate-y-1/2 text-gray-500 focus:outline-none"
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
 
         <button
           type="submit"
