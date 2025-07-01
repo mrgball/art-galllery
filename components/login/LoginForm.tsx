@@ -5,14 +5,14 @@ import Link from 'next/link';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { AlertTriangle, CheckCircle } from 'lucide-react';
 import FullscreenSpinner from '../shared/FullScreenSpinner';
-import { useAuthQuery } from '@/lib/query/auth';
+import { useAuthService } from '@/lib/services/authService';
 import { Eye, EyeOff } from "lucide-react";
 import useAuthStore from '@/lib/store/authStore';
 import { useRouter } from 'next/navigation';
 
 
 export default function LoginForm() {
-  const {method} = useAuthQuery();
+  const {method} = useAuthService();
   const [form, setForm] = useState({ username: '', password: '' });
   const [alert, setAlert] = useState<{
     type: 'success' | 'error';

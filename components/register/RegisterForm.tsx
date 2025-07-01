@@ -5,12 +5,12 @@ import { AlertTriangle, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 import FullscreenSpinner from '../shared/FullScreenSpinner';
 import { useEffect, useState } from 'react';
-import { useAuthQuery } from '@/lib/query/auth';
+import { useAuthService } from '@/lib/services/authService';
 import { Eye, EyeOff } from "lucide-react";
 
 
 export default function RegisterForm() {
-    const {data, method} = useAuthQuery();
+    const {data, method} = useAuthService();
     const [form, setForm] = useState({
         name: '',
         email: '',
