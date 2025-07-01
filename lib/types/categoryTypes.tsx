@@ -1,6 +1,8 @@
 export interface CategoryStore {
+    message: string | null;
     categories: Category[];
     setCategories: (category: Category[]) => void;
+    setMessage: (message: string) => void,
 }
 
 export interface Category {
@@ -15,7 +17,22 @@ export interface GetCategoryResponse {
 }
 
 export interface CreateCategoryResponse {
-    createCategory: Category;
+    createCategory: {
+        category: {
+            name: string
+        }
+        message: string,
+    };
+}
+
+export interface DeleteCategoryResponse {
+    deleteCategory: {
+        category: {
+            id: number;
+            name: string
+        }
+        message: string,
+    };
 }
 
 

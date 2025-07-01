@@ -22,10 +22,22 @@ export const GET_CATEGORY = gql`
 export const CREATE_CATEGORY = gql`
   mutation CreateCategory($name: String!) {
     createCategory(input: { name: $name }) {
-      id
-      name
+      message,
+      category {
+        name,
+      }
     }
   }
 `;
+
+/// DELETE CATEGORY
+export const DELETE_CATEGORY = gql`
+  mutation DeleteCategory($id: ID!) {
+  deleteCategory(id: $id) {
+    message
+  }
+}
+`;
+
 
 
